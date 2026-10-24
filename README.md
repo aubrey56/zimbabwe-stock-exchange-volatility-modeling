@@ -1,41 +1,39 @@
-# zimbabwe-stock-exchange-volatility-modeling
-Time series analysis of the Zimbabwe Stock Exchange (ZSE) All Share Index using R. The project computes log returns, performs ADF and ARCH tests, and estimates a GARCH(1,1) model to analyze volatility clustering and conditional variance in financial market data.
+# Econometric Volatility Modelling & Value at Risk (VaR) Engine for the ZSE
 
+An institutional-grade, out-of-sample quantitative risk framework built for the Zimbabwe Stock Exchange (ZSE) All-Share Index (2019–2023). This project demonstrates time-series preprocessing, GARCH model calibration, out-of-sample volatility forecasting, and Value at Risk (VaR) Kupiec backtesting.
 
-## Project Overview
-This project analyzes volatility in the Zimbabwe Stock Exchange (ZSE) All Share Index using ARCH and GARCH models in R.
+## Executive Summary
+- **Data Scope:** 1,207 daily observations (January 2019 – December 2023)
+- **Primary Finding:** Standard Gaussian models severely under-estimate downside risk. A **Student-$t$ $\text{sGARCH}(1,1)$ framework** reduces out-of-sample forecast error (RMSE) by **55%** relative to rolling historical volatility benchmarks.
+- **Volatility Persistence:** Near-unity persistence ($\alpha_1 + \beta_1 = 0.9500$), confirming long memory in ZSE market shocks.
+- **VaR Backtest Validation:** Passed the **Kupiec Proportion of Failures Test** at both 95% ($p = 0.3391$) and 99% ($p = 0.2985$) confidence levels.
 
-The goal is to model financial market volatility and detect volatility clustering using econometric time series methods.
+## Key Statistical Diagnostics
+| Diagnostic Test | Test Statistic | p-value | Conclusion |
+| :--- | :--- | :--- | :--- |
+| **Augmented Dickey-Fuller (ADF)** | -13.201371 | < 0.0001 | Log returns are covariance stationary $I(0)$ |
+| **Jarque-Bera Normality** | 7,316,376.39 | < 0.0001 | Decisively rejects Gaussian normality (Kurtosis = 384.41) |
+| **Ljung-Box $LB(12)$ on $R_t^2$** | 300.828 | < 0.0001 | Strong ARCH effects & volatility clustering |
 
-## Methods Used
-- Log Return Calculation
-- Augmented Dickey-Fuller Stationarity Test
-- ARCH Effect Test
-- GARCH(1,1) Volatility Model
+## Out-of-Sample Performance (2023 Holdout Set)
+| Model Specification | Out-of-Sample RMSE | Out-of-Sample MAE | Ranking |
+| :--- | :---: | :---: | :---: |
+| Historical Volatility Benchmark | 0.045361 | 0.043024 | 3 |
+| $\text{sGARCH}(1,1)$ - Gaussian Normal | 0.033366 | 0.031292 | 2 |
+| **$\text{sGARCH}(1,1)$ - Student-$t$ ($\nu = 5.0$)** | **0.020441** | **0.016069** | **1 (Optimal)** |
 
-## Technologies
-- R
-- dplyr
-- tseries
-- rugarch
-- FinTS
+## Value at Risk (VaR) Backtest Results
+| Risk Horizon | Confidence ($\alpha$) | Expected Breaches | Observed Breaches | Kupiec LR Stat | p-value | Decision |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **1-Day VaR** | 95% | 12 | **9** | 0.9140 | **0.3391** | **PASS** |
+| **1-Day VaR** | 99% | 2 | **1** | 1.0809 | **0.2985** | **PASS** |
 
-## Key Findings
-- The return series is stationary (ADF test).
-- ARCH effects are present, indicating volatility clustering.
-- The GARCH(1,1) model shows strong volatility persistence.
-
-## Model
-Variance equation:
-
-σ²ₜ = ω + αε²ₜ₋₁ + βσ²ₜ₋₁
-
-## Visualizations
-### Returns
-![Returns Plot](output/returns_plot.png)
-
-### Conditional Volatility
-![Volatility Plot](output/conditional_volatility.png)
-
-## Author
-Applied Statistics Student | Data Analytics Enthusiast
+## How to Reproduce
+1. Clone the repository: `git clone https://github.com/your-username/zse-volatility-garch.git`
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run data pipeline:
+   ```bash
+   python src/01_data_preprocessing.py
+   python src/02_exploratory_analysis.py
+   python src/03_model_comparison.py
+   python src/04_var_backtesting.py
