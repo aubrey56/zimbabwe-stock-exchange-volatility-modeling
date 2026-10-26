@@ -1,39 +1,24 @@
-# Econometric Volatility Modelling & Value at Risk (VaR) Engine for the ZSE
+# Econometric Volatility & Value at Risk (VaR) Engine for the ZSE
 
-An institutional-grade, out-of-sample quantitative risk framework built for the Zimbabwe Stock Exchange (ZSE) All-Share Index (2019–2023). This project demonstrates time-series preprocessing, GARCH model calibration, out-of-sample volatility forecasting, and Value at Risk (VaR) Kupiec backtesting.
+An institutional-grade, out-of-sample quantitative risk framework built for the Zimbabwe Stock Exchange (ZSE) All-Share Index (2019–2023).
 
-## Executive Summary
-- **Data Scope:** 1,207 daily observations (January 2019 – December 2023)
-- **Primary Finding:** Standard Gaussian models severely under-estimate downside risk. A **Student-$t$ $\text{sGARCH}(1,1)$ framework** reduces out-of-sample forecast error (RMSE) by **55%** relative to rolling historical volatility benchmarks.
-- **Volatility Persistence:** Near-unity persistence ($\alpha_1 + \beta_1 = 0.9500$), confirming long memory in ZSE market shocks.
-- **VaR Backtest Validation:** Passed the **Kupiec Proportion of Failures Test** at both 95% ($p = 0.3391$) and 99% ($p = 0.2985$) confidence levels.
+## Key Visualizations & Empirical Plots
 
-## Key Statistical Diagnostics
-| Diagnostic Test | Test Statistic | p-value | Conclusion |
-| :--- | :--- | :--- | :--- |
-| **Augmented Dickey-Fuller (ADF)** | -13.201371 | < 0.0001 | Log returns are covariance stationary $I(0)$ |
-| **Jarque-Bera Normality** | 7,316,376.39 | < 0.0001 | Decisively rejects Gaussian normality (Kurtosis = 384.41) |
-| **Ljung-Box $LB(12)$ on $R_t^2$** | 300.828 | < 0.0001 | Strong ARCH effects & volatility clustering |
+### 1. Exploratory Diagnostics & Fat Tails
+![ZSE Diagnostics](figures/step2_diagnostics.png)
+*Figure 1: Price levels, daily log return volatility clustering, and return distribution vs. Gaussian normal curve.*
 
-## Out-of-Sample Performance (2023 Holdout Set)
-| Model Specification | Out-of-Sample RMSE | Out-of-Sample MAE | Ranking |
-| :--- | :---: | :---: | :---: |
-| Historical Volatility Benchmark | 0.045361 | 0.043024 | 3 |
-| $\text{sGARCH}(1,1)$ - Gaussian Normal | 0.033366 | 0.031292 | 2 |
-| **$\text{sGARCH}(1,1)$ - Student-$t$ ($\nu = 5.0$)** | **0.020441** | **0.016069** | **1 (Optimal)** |
+### 2. Autocorrelation & ARCH Effects
+![ACF PACF Plots](figures/step2_acf_pacf.png)
+*Figure 2: Autocorrelation (ACF) and Partial Autocorrelation (PACF) plots of log returns and squared log returns.*
 
-## Value at Risk (VaR) Backtest Results
-| Risk Horizon | Confidence ($\alpha$) | Expected Breaches | Observed Breaches | Kupiec LR Stat | p-value | Decision |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **1-Day VaR** | 95% | 12 | **9** | 0.9140 | **0.3391** | **PASS** |
-| **1-Day VaR** | 99% | 2 | **1** | 1.0809 | **0.2985** | **PASS** |
+### 3. Out-of-Sample Volatility Forecast Evaluation
+![Volatility Forecast Comparison](figures/step3_model_forecast_comparison.png)
+*Figure 3: Out-of-sample volatility forecast performance comparing Historical Volatility, Gaussian GARCH, and Student-t GARCH against realized volatility.*
 
-## How to Reproduce
-1. Clone the repository: `git clone https://github.com/your-username/zse-volatility-garch.git`
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run data pipeline:
-   ```bash
-   python src/01_data_preprocessing.py
-   python src/02_exploratory_analysis.py
-   python src/03_model_comparison.py
-   python src/04_var_backtesting.py
+### 4. Value at Risk (VaR) Backtesting & Exceedances
+![VaR Backtest Exceedances](figures/step4_var_backtest_exceedances.png)
+*Figure 4: 95% and 99% 1-Day Value at Risk thresholds plotted against actual daily returns with highlighted Kupiec breaches.*
+
+## Project Reports
+- Full Executive Report: [reports/findings.md](reports/findings.md)
